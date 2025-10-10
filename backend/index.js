@@ -25,9 +25,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // routes
-app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/properties", propertyRoutes);
+app.use("/auth", authRoutes);
+app.use("/users", userRoutes);
+app.use("/properties", propertyRoutes);
 
 // test route for root
 app.get("/", (req, res) => {
