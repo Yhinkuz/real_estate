@@ -21,10 +21,15 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/properties", propertyRoutes);
 
+// test route for root
+app.get("/", (req, res) => {
+  res.send("Backend server is running successfully!");
+});
+
 // connect DB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
-    console.log(" MongoDB connected");
+    console.log("MongoDB connected");
     app.listen(process.env.PORT || 5000, () =>
       console.log(`Server running on port ${process.env.PORT || 5000}`)
     );
