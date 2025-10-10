@@ -13,9 +13,14 @@ const app = express();
 
 // middleware
 app.use(cors({
-  origin: ["https://starter-homes-frontend.onrender.com"], // your frontend URL
+  origin: [
+    "https://starter-homes.onrender.com",           // your actual deployed frontend
+    "https://starter-homes-frontend.onrender.com",  // optional, if you still use this link
+    "http://localhost:5173",                        // optional, for local development
+  ],
   credentials: true,
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
