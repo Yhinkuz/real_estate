@@ -1,118 +1,89 @@
-import { useParams, Link } from "react-router-dom";
-import FourBedroomImg from "../assets/4BedroomFullyDetachedDuplex.jpeg";
-import FourDuplexImg from "../assets/4BedroomsTerracedDuplex.jpeg";
-import FullyServicedImg from "../assets/FullyServiced3BedroomApartmentwithgym.jpeg";
-import UnfurnishedImg from "../assets/Unfurnished2BedroomTerrace.jpeg";
-import FourBedroomRImg from "../assets/fourBedroomRiver.jpeg";
-import NineBedroomImg from "../assets/NineBedroomExquisite.jpg";
-
-
-const properties = [
-  {
-    id: 1,
-    title: "4 Bedroom Fully Detached Duplex",
-    details: "For sale 4 bedroom fully detached duplex price: 160m...",
-    location: "Ajah, Lagos",
-    price: 160000000,
-    images: [FourBedroomImg],
-    contact: "08183987654",
-  },
-  {
-    id: 2,
-    title: "4-Bedroom Luxury Apartment",
-    details: "Discover timeless luxury in Maitama, Abuja...",
-    location: "Maitama, Abuja",
-    price: 6500000,
-    images: [FourDuplexImg, NineBedroomImg],
-    contact: "08183987655",
-  },
-  {
-    id: 3,
-    title: "Unfurnished 2 Bedroom Terrace Duplex",
-    details: "2 bedroom terrace duplex at Bodija...",
-    location: "Bodija, Ibadan",
-    price: 4500000,
-    images: [UnfurnishedImg],
-    contact: "08183987656",
-  },
-  {
-    id: 4,
-    title: "Fully Serviced 3 Bedroom Apartment",
-    details: "3 bedroom apartment with gym and pool...",
-    location: "Port Harcourt",
-    price: 15000000,
-    images: [FullyServicedImg],
-    contact: "08183987657",
-  },
-  {
-    id: 5,
-    title: "4 Bedroom Terraced Duplex",
-    details: "Carcass with BQ in Kaura district...",
-    location: "Kaura, Abuja",
-    price: 150000000,
-    images: [FourBedroomRImg],
-    contact: "08183987658",
-  },
-  {
-    id: 6,
-    title: "9 Bedroom Exquisite Mansion",
-    details: "For sale 9 bedroom mansion in Maitama...",
-    location: "Maitama, Abuja",
-    price: 10000000000,
-    images: [NineBedroomImg],
-    contact: "08183987659",
-  },
-];
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { properties } from "../data/properties";
 
 function PropertyDetails() {
   const { id } = useParams();
-  const property = properties.find((p) => p.id === parseInt(id));
+  const navigate = useNavigate();
+  const [property, setProperty] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!property) {
+  useEffect(() => {
+    // Check local data first
+    const found = properties.find(p => p.id === parseInt(id));
+    
+    if (found) {
+      setProperty(found);
+      setLoading(false);
+    } else {
+      // If not in local data, you could fetch from API
+      setLoading(false);
+    }
+  }, [id]);
+
+  if (loading) {
     return (
-      <div className="container mx-auto p-6 text-center">
-        <h1 className="text-2xl font-bold">Property not found</h1>
-        <Link to="/" className="text-green-600 mt-4 inline-block">
-          Back to Home
-        </Link>
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-gray-500 text-lg">Loading property details...</p>
       </div>
     );
   }
 
+  if (!property) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <p className="text-gray-600 text-lg mb-4">Property not found.</p>
+        <button
+          onClick={() => navigate("/")}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Back to Home
+        </button>
+      </div>
+    );
+  }
+
+  const imageSrc = property.images?.[0] || property.image || "https://via.placeholder.com/600x400";
+
   return (
-    <div className="container mx-auto p-6">
-      {/* Image gallery */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        {property.images.map((img, index) => (
-          <img
-            key={index}
-            src={img}
-            alt={`${property.title} ${index + 1}`}
-            className="w-full h-[400px] object-cover rounded-lg"
-          />
-        ))}
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      <button
+        onClick={() => navigate("/")}
+        className="text-blue-600 hover:underline mb-4"
+      >
+        ← Back to Home
+      </button>
+
+      <div className="w-full mb-6">
+        <img
+          src={imageSrc}
+          alt={property.title}
+          className="w-full h-96 object-cover rounded-2xl shadow-lg"
+        />
       </div>
 
-      <h1 className="text-3xl font-bold mb-4">{property.title}</h1>
-      <p className="text-gray-700 mb-2">
-        <strong>Description: </strong>{property.details}
-      </p>
-      <p className="text-gray-700 mb-2">
-        <strong>Location:</strong> {property.location}
-      </p>
-      <p className="text-gray-700 mb-2">
-        <strong>Contact:</strong> {property.contact}
-      </p>
-      <p className="text-blue-600 font-semibold text-xl">
-        ₦{property.price.toLocaleString()}
+      <h1 className="text-3xl font-bold mb-2">{property.title}</h1>
+      <p className="text-gray-600 mb-2">{property.location}</p>
+      <p className="text-2xl font-semibold text-green-600 mb-4">
+        ₦{property.price?.toLocaleString()}
       </p>
 
-      <Link
-        to="/"
-        className="mt-4 inline-block text-white bg-green-600 px-4 py-2 rounded hover:bg-green-700 transition"
-      >
-        Back to Home
-      </Link>
+      <p className="text-gray-700 mb-6">{property.details}</p>
+
+      <div className="flex flex-col sm:flex-row gap-4">
+        <a
+          href={`tel:${property.contact}`}
+          className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 text-center"
+        >
+          Contact Seller: {property.contact}
+        </a>
+        <button
+          onClick={() => navigate("/")}
+          className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300"
+        >
+          See More Properties
+        </button>
+      </div>
     </div>
   );
 }

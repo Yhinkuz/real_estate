@@ -15,7 +15,7 @@ function ChangePassword() {
     try {
       await api.put("/auth/change-password", { oldPassword, newPassword });
 
-      // ✅ Clear localStorage and redirect to login
+      //  Clear localStorage and redirect to login
       localStorage.removeItem("token");
       localStorage.removeItem("currentUser");
       alert("Password updated successfully. Please login again.");

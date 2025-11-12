@@ -17,13 +17,13 @@ function Login({ setCurrentUser }) {
     try {
       const { data } = await api.post("/auth/login", formData);
 
-      // ✅ Save user + token in localStorage
+      //  Save user + token in localStorage
       localStorage.setItem("currentUser", JSON.stringify(data.user));
       localStorage.setItem("token", data.token);
 
       setCurrentUser(data.user);
 
-      // ✅ Redirect based on role
+      // Redirect based on role
       navigate(data.user.isAdmin ? "/admin" : "/dashboard");
     } catch (err) {
       console.error(err);

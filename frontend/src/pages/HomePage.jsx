@@ -2,7 +2,7 @@
 import { useState } from "react";
 import PropertyCard from "../components/PropertyCard";
 import Banner from "../components/Banner";
-import { properties } from "../data/properties"; // ✅ use shared data
+import { properties } from "../data/properties"; //  use shared data
 
 function HomePage() {
   const [search, setSearch] = useState("");

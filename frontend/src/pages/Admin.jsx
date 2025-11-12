@@ -1,50 +1,78 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+import api from "../utils/api";
 
-function AdminUserProfile() {
-  const { id } = useParams();
-  const [user, setUser] = useState(null);
-  const [error, setError] = useState("");
+function Admin() {
+  const [users, setUsers] = useState([]);
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`http://localhost:5000/api/users/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const data = await res.json();
-        if (!res.ok) {
-          setError(data.msg || "Failed to load user");
-          return;
-        }
-
-        setUser(data);
+        const [usersRes, propsRes] = await Promise.all([
+          api.get("/users"),
+          api.get("/properties"),
+        ]);
+        setUsers(usersRes.data);
+        setProperties(propsRes.data);
       } catch (err) {
-        setError("Server error");
+        console.error("Error fetching admin data:", err);
+      } finally {
+        setLoading(false);
       }
     };
+    fetchData();
+  }, []);
 
-    fetchUser();
-  }, [id]);
-
-  if (error) return <p className="text-red-500">{error}</p>;
-  if (!user) return <p>Loading...</p>;
+  if (loading) return <p className="text-center mt-10">Loading admin panel...</p>;
 
   return (
-    <div className="max-w-lg mx-auto bg-white p-6 shadow rounded">
-      <h2 className="text-2xl font-bold mb-4">User Profile</h2>
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
-      <div className="space-y-2">
-        <p><strong>Name:</strong> {user.name}</p>
-        <p><strong>Email:</strong> {user.email}</p>
-        <p><strong>Phone:</strong> {user.phone || "N/A"}</p>
-        <p><strong>Address:</strong> {user.address || "N/A"}</p>
-        <p><strong>Admin:</strong> {user.isAdmin ? "Yes" : "No"}</p>
-      </div>
+      {/* Users Section */}
+      <section className="mb-8">
+        <h2 className="text-2xl font-semibold mb-4">All Users ({users.length})</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {users.map((user) => (
+            <div key={user._id} className="bg-white p-4 shadow rounded-lg">
+              <p className="font-semibold">{user.name}</p>
+              <p className="text-sm text-gray-600">{user.email}</p>
+              <p className="text-xs text-gray-500">
+                {user.isAdmin ? "Admin" : "User"}
+              </p>
+              <Link
+                to={`/admin/user/${user._id}`}
+                className="text-blue-600 text-sm hover:underline mt-2 inline-block"
+              >
+                View Profile
+              </Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Properties Section */}
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">All Properties ({properties.length})</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {properties.map((property) => (
+            <div key={property._id} className="bg-white p-4 shadow rounded-lg">
+              <img
+                src={property.image || property.images?.[0] || "https://via.placeholder.com/400"}
+                alt={property.title}
+                className="w-full h-40 object-cover rounded mb-2"
+              />
+              <p className="font-semibold">{property.title}</p>
+              <p className="text-sm text-gray-600">{property.location}</p>
+              <p className="text-green-600 font-bold">₦{property.price?.toLocaleString()}</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
 
-export default AdminUserProfile;
+export default Admin;

@@ -13,10 +13,11 @@ import PropertyDetails from "./pages/PropertyDetails";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ChangePassword from "./pages/ChangePassword";
 import AdminUserProfile from "./pages/AdminUserProfile";
-
-// ⬇️ Import your new pages
 import Profile from "./pages/Profile";
 import ProfileUpdate from "./pages/ProfileUpdate";
+import SimilarProperties from "./pages/SimilarProperties";
+import SavedProperties from "./pages/SavedProperties";
+import MyRequests from "./pages/MyRequests";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(() => {
@@ -34,16 +35,20 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      {/*  Navbar */}
       <Navbar currentUser={currentUser} setCurrentUser={setCurrentUser} />
 
+      {/*  Main Content */}
       <main className="flex-grow p-4">
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login setCurrentUser={setCurrentUser} />} />
 
+          {/* Protected Routes */}
           <Route
             path="/dashboard"
             element={
@@ -53,7 +58,6 @@ function App() {
             }
           />
 
-          {/* ⬇️ Add these */}
           <Route
             path="/profile"
             element={
@@ -62,6 +66,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/profile/update"
             element={
@@ -71,7 +76,16 @@ function App() {
             }
           />
 
-          <Route path="/change-password" element={<ChangePassword />} />
+          <Route
+            path="/change-password"
+            element={
+              <ProtectedRoute>
+                <ChangePassword />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin-Only Routes */}
           <Route
             path="/admin"
             element={
@@ -80,17 +94,57 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/admin/user/:id"
+
+          <Route
+            path="/admin/user/:id"
             element={
               <ProtectedRoute adminOnly>
                 <AdminUserProfile />
               </ProtectedRoute>
-          }
+            }
           />
-          <Route path="/property/:id" element={<PropertyDetails />} />
+
+          {/* Property-Related Routes */}
+          <Route
+            path="/property/:id"
+            element={
+              <ProtectedRoute>
+                <PropertyDetails />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/similar-properties"
+            element={
+              <ProtectedRoute>
+                <SimilarProperties />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/saved"
+            element={
+              <ProtectedRoute>
+                <SavedProperties />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*  Fixed — My Property Requests now inside <Routes> */}
+          <Route
+            path="/requests"
+            element={
+              <ProtectedRoute>
+                <MyRequests />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
 
+      {/*  Footer */}
       <Footer />
     </div>
   );
